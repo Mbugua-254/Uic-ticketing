@@ -2343,6 +2343,12 @@
         }
         window.loadRegistrations = loadRegistrations;
 
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
         function renderRegistrations(registrations) {
             const list = document.getElementById('registrationsList');
 
@@ -2353,13 +2359,31 @@
 
             let html = '';
             registrations.forEach(reg => {
-                const name = reg.full_name || 'Unknown';
-                const email = reg.email || '—';
-                const phone = reg.phone || '—';
-                const ticket = ticketTypeMap[reg.ticket_type] || reg.ticket_type || '—';
-                const church = reg.church || '—';
-                const county = reg.county || '—';
-                const time = reg.registeredAt ? new Date(reg.registeredAt).toLocaleString() : '—';
+                const name = escapeHtml(reg.full_name || 'Unknown');
+                const email = escapeHtml(reg.email || '—');
+                const phone = escapeHtml(reg.phone || '—');
+                const ticket = escapeHtml(ticketTypeMap[reg.ticket_type] || reg.ticket_type || '—');
+                const church = escapeHtml(reg.church || '—');
+                const county = escapeHtml(reg.county || '—');
+                const time = reg.registeredAt ? escapeHtml(new Date(reg.registeredAt).toLocaleString()) : '—';
+
+                const extras = [];
+                if (reg.whatsapp) extras.push('💬 WhatsApp: ' + escapeHtml(reg.whatsapp));
+                if (reg.gender) extras.push('⚧ Gender: ' + escapeHtml(reg.gender));
+                if (reg.age_group) extras.push('🎂 Age: ' + escapeHtml(reg.age_group));
+                if (reg.church_location) extras.push('📌 Church location: ' + escapeHtml(reg.church_location));
+                if (reg.instagram) extras.push('📷 Instagram: ' + escapeHtml(reg.instagram));
+                if (reg.tiktok) extras.push('🎵 TikTok: ' + escapeHtml(reg.tiktok));
+
+                const members = [];
+                for (let n = 2; n <= 5; n++) {
+                    const memberName = reg['member' + n];
+                    const memberPhone = reg['member' + n + '_phone'];
+                    if (memberName || memberPhone) {
+                        members.push('Member ' + n + ': ' + escapeHtml(memberName || '—') +
+                            (memberPhone ? ' (' + escapeHtml(memberPhone) + ')' : ''));
+                    }
+                }
 
                 html += `
                     <div class="registration-item">
@@ -2371,6 +2395,9 @@
                                 <span>⛪ ${church}</span>
                                 <span>📍 ${county}</span>
                             </div>
+                            ${extras.length ? '<div class="meta" style="margin-top:4px;">' + extras.map(e => `<span>${e}</span>`).join('') + '</div>' : ''}
+                            ${members.length ? '<div class="meta" style="margin-top:4px;">' + members.map(m => `<span>👥 ${m}</span>`).join('') + '</div>' : ''}
+                            ${reg.prayer_request ? '<div class="meta" style="margin-top:4px;"><span>🙏 ' + escapeHtml(reg.prayer_request) + '</span></div>' : ''}
                         </div>
                         <div style="text-align: right;">
                             <div><span class="badge-ticket">${ticket}</span></div>
