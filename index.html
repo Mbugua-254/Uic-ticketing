@@ -1931,7 +1931,7 @@
                 <button class="btn btn-primary" onclick="loadRegistrations()">🔄 Refresh</button>
                 <button class="btn btn-success" onclick="exportToCSV()">📥 Export CSV</button>
                 <button class="btn btn-danger" onclick="exportToPDF()">📄 Export PDF</button>
-                <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: auto;" id="dataSourceLabel">Source: localStorage 💾</span>
+                <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: auto;" id="dataSourceLabel">Source: Netlify Database 🗄️</span>
             </div>
 
             <div id="registrationsList" style="display: grid; gap: 10px;">
@@ -2042,6 +2042,7 @@
         // ---------- PASSWORD PROTECTION ----------
         const ADMIN_PASSWORD = "12345678";
         let isAdminAuthenticated = false;
+        let adminPasswordValue = '';
 
         function requestAdminAccess() {
             const overlay = document.getElementById('passwordOverlay');
@@ -2062,6 +2063,7 @@
             const error = document.getElementById('passwordError');
             if (input.value === ADMIN_PASSWORD) {
                 isAdminAuthenticated = true;
+                adminPasswordValue = input.value;
                 closePasswordModal();
                 openAdminDashboard();
             } else {
@@ -2246,8 +2248,9 @@
         window.hideTicket = hideTicket;
         window.downloadTicket = downloadTicket;
 
-        // ---------- SAVE TO LOCALSTORAGE ----------
-        function saveRegistration(payload) {
+        // ---------- SAVE REGISTRATION ----------
+        async function saveRegistration(payload) {
+            // Keep a local copy so "My Tickets" can show bookings made on this device.
             try {
                 const key = 'uic_registrations';
                 const existing = JSON.parse(localStorage.getItem(key) || '[]');
@@ -2263,10 +2266,24 @@
                 cleanData.localId = Date.now();
                 existing.push(cleanData);
                 localStorage.setItem(key, JSON.stringify(existing));
-                console.log('💾 Booking saved to localStorage');
-                return { success: true, id: 'local-' + Date.now(), source: 'localStorage' };
             } catch (e) {
-                console.error('❌ LocalStorage save error:', e);
+                console.warn('Could not save local ticket copy:', e);
+            }
+
+            try {
+                const response = await fetch('/api/registrations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.error || ('Request failed with status ' + response.status));
+                }
+                console.log('💾 Booking saved to database');
+                return { success: true, source: 'database' };
+            } catch (e) {
+                console.error('❌ Database save error:', e);
                 return { success: false, error: e.message };
             }
         }
@@ -2283,16 +2300,31 @@
             const list = document.getElementById('registrationsList');
             list.innerHTML = '<p style="color: var(--text-soft); text-align: center; padding: 20px;">Loading bookings...</p>';
 
-            try {
-                const localData = JSON.parse(localStorage.getItem('uic_registrations') || '[]');
-                allRegistrations = localData.map(item => ({ id: item.localId || 'local', ...item }));
-                renderRegistrations(allRegistrations);
-                updateStats(allRegistrations);
-                document.getElementById('dataSourceLabel').textContent = 'Source: localStorage 💾';
-            } catch (e) {
-                list.innerHTML = '<p style="color: var(--danger);">❌ Error loading bookings.</p>';
-                console.error(e);
-            }
+            fetch('/api/registrations', {
+                headers: { 'x-admin-password': adminPasswordValue }
+            })
+                .then(async response => {
+                    if (!response.ok) {
+                        throw new Error('Request failed with status ' + response.status);
+                    }
+                    const data = await response.json();
+                    allRegistrations = data.registrations.map(item => ({
+                        full_name: item.fullName,
+                        email: item.email,
+                        phone: item.phone,
+                        church: item.church,
+                        county: item.county,
+                        ticket_type: item.ticketType,
+                        registeredAt: item.registeredAt
+                    }));
+                    renderRegistrations(allRegistrations);
+                    updateStats(allRegistrations);
+                    document.getElementById('dataSourceLabel').textContent = 'Source: Netlify Database 🗄️';
+                })
+                .catch(e => {
+                    list.innerHTML = '<p style="color: var(--danger);">❌ Error loading bookings.</p>';
+                    console.error(e);
+                });
         }
         window.loadRegistrations = loadRegistrations;
 
@@ -2613,11 +2645,10 @@
 
                 // Simulate processing
                 registerSubmit.textContent = '⏳ Processing...';
-                
-                // Use setTimeout to simulate async operation
-                setTimeout(() => {
-                    const saveResult = saveRegistration(payload);
-                    
+
+                (async () => {
+                    const saveResult = await saveRegistration(payload);
+
                     if (!saveResult.success) {
                         alert('⚠️ Booking could not be saved. Please try again.');
                         registerSubmit.textContent = 'Book Ticket';
@@ -2628,7 +2659,7 @@
                     showTicket(payload);
                     alert('✅ Booking successful! Your ticket is ready below.\n📁 Booking saved to ' + saveResult.source +
                         '\n💳 Pay via M-Pesa Till: 216445');
-                    
+
                     if (document.getElementById('admin').classList.contains('show')) {
                         loadRegistrations();
                     }
@@ -2639,7 +2670,7 @@
 
                     registerSubmit.textContent = 'Book Ticket';
                     registerSubmit.disabled = false;
-                }, 1000);
+                })();
 
             } catch (error) {
                 alert('⚠️ An error occurred. Please try again.');
