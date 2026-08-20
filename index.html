@@ -1931,7 +1931,7 @@
                 <button class="btn btn-primary" onclick="loadRegistrations()">🔄 Refresh</button>
                 <button class="btn btn-success" onclick="exportToCSV()">📥 Export CSV</button>
                 <button class="btn btn-danger" onclick="exportToPDF()">📄 Export PDF</button>
-                <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: auto;" id="dataSourceLabel">Source: localStorage 💾</span>
+                <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: auto;" id="dataSourceLabel">Source: Netlify Database 🗄️</span>
             </div>
 
             <div id="registrationsList" style="display: grid; gap: 10px;">
@@ -2042,6 +2042,7 @@
         // ---------- PASSWORD PROTECTION ----------
         const ADMIN_PASSWORD = "12345678";
         let isAdminAuthenticated = false;
+        let adminPasswordValue = '';
 
         function requestAdminAccess() {
             const overlay = document.getElementById('passwordOverlay');
@@ -2062,6 +2063,7 @@
             const error = document.getElementById('passwordError');
             if (input.value === ADMIN_PASSWORD) {
                 isAdminAuthenticated = true;
+                adminPasswordValue = input.value;
                 closePasswordModal();
                 openAdminDashboard();
             } else {
@@ -2246,8 +2248,9 @@
         window.hideTicket = hideTicket;
         window.downloadTicket = downloadTicket;
 
-        // ---------- SAVE TO LOCALSTORAGE ----------
-        function saveRegistration(payload) {
+        // ---------- SAVE REGISTRATION ----------
+        async function saveRegistration(payload) {
+            // Keep a local copy so "My Tickets" can show bookings made on this device.
             try {
                 const key = 'uic_registrations';
                 const existing = JSON.parse(localStorage.getItem(key) || '[]');
@@ -2263,10 +2266,24 @@
                 cleanData.localId = Date.now();
                 existing.push(cleanData);
                 localStorage.setItem(key, JSON.stringify(existing));
-                console.log('💾 Booking saved to localStorage');
-                return { success: true, id: 'local-' + Date.now(), source: 'localStorage' };
             } catch (e) {
-                console.error('❌ LocalStorage save error:', e);
+                console.warn('Could not save local ticket copy:', e);
+            }
+
+            try {
+                const response = await fetch('/api/registrations', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.error || ('Request failed with status ' + response.status));
+                }
+                console.log('💾 Booking saved to database');
+                return { success: true, source: 'database' };
+            } catch (e) {
+                console.error('❌ Database save error:', e);
                 return { success: false, error: e.message };
             }
         }
@@ -2283,18 +2300,54 @@
             const list = document.getElementById('registrationsList');
             list.innerHTML = '<p style="color: var(--text-soft); text-align: center; padding: 20px;">Loading bookings...</p>';
 
-            try {
-                const localData = JSON.parse(localStorage.getItem('uic_registrations') || '[]');
-                allRegistrations = localData.map(item => ({ id: item.localId || 'local', ...item }));
-                renderRegistrations(allRegistrations);
-                updateStats(allRegistrations);
-                document.getElementById('dataSourceLabel').textContent = 'Source: localStorage 💾';
-            } catch (e) {
-                list.innerHTML = '<p style="color: var(--danger);">❌ Error loading bookings.</p>';
-                console.error(e);
-            }
+            fetch('/api/registrations', {
+                headers: { 'x-admin-password': adminPasswordValue }
+            })
+                .then(async response => {
+                    if (!response.ok) {
+                        throw new Error('Request failed with status ' + response.status);
+                    }
+                    const data = await response.json();
+                    allRegistrations = data.registrations.map(item => ({
+                        full_name: item.fullName,
+                        email: item.email,
+                        phone: item.phone,
+                        whatsapp: item.whatsapp,
+                        gender: item.gender,
+                        age_group: item.ageGroup,
+                        church: item.church,
+                        church_location: item.churchLocation,
+                        county: item.county,
+                        ticket_type: item.ticketType,
+                        prayer_request: item.prayerRequest,
+                        instagram: item.instagram,
+                        tiktok: item.tiktok,
+                        member2: item.member2,
+                        member2_phone: item.member2Phone,
+                        member3: item.member3,
+                        member3_phone: item.member3Phone,
+                        member4: item.member4,
+                        member4_phone: item.member4Phone,
+                        member5: item.member5,
+                        member5_phone: item.member5Phone,
+                        registeredAt: item.registeredAt
+                    }));
+                    renderRegistrations(allRegistrations);
+                    updateStats(allRegistrations);
+                    document.getElementById('dataSourceLabel').textContent = 'Source: Netlify Database 🗄️';
+                })
+                .catch(e => {
+                    list.innerHTML = '<p style="color: var(--danger);">❌ Error loading bookings.</p>';
+                    console.error(e);
+                });
         }
         window.loadRegistrations = loadRegistrations;
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
 
         function renderRegistrations(registrations) {
             const list = document.getElementById('registrationsList');
@@ -2306,13 +2359,31 @@
 
             let html = '';
             registrations.forEach(reg => {
-                const name = reg.full_name || 'Unknown';
-                const email = reg.email || '—';
-                const phone = reg.phone || '—';
-                const ticket = ticketTypeMap[reg.ticket_type] || reg.ticket_type || '—';
-                const church = reg.church || '—';
-                const county = reg.county || '—';
-                const time = reg.registeredAt ? new Date(reg.registeredAt).toLocaleString() : '—';
+                const name = escapeHtml(reg.full_name || 'Unknown');
+                const email = escapeHtml(reg.email || '—');
+                const phone = escapeHtml(reg.phone || '—');
+                const ticket = escapeHtml(ticketTypeMap[reg.ticket_type] || reg.ticket_type || '—');
+                const church = escapeHtml(reg.church || '—');
+                const county = escapeHtml(reg.county || '—');
+                const time = reg.registeredAt ? escapeHtml(new Date(reg.registeredAt).toLocaleString()) : '—';
+
+                const extras = [];
+                if (reg.whatsapp) extras.push('💬 WhatsApp: ' + escapeHtml(reg.whatsapp));
+                if (reg.gender) extras.push('⚧ Gender: ' + escapeHtml(reg.gender));
+                if (reg.age_group) extras.push('🎂 Age: ' + escapeHtml(reg.age_group));
+                if (reg.church_location) extras.push('📌 Church location: ' + escapeHtml(reg.church_location));
+                if (reg.instagram) extras.push('📷 Instagram: ' + escapeHtml(reg.instagram));
+                if (reg.tiktok) extras.push('🎵 TikTok: ' + escapeHtml(reg.tiktok));
+
+                const members = [];
+                for (let n = 2; n <= 5; n++) {
+                    const memberName = reg['member' + n];
+                    const memberPhone = reg['member' + n + '_phone'];
+                    if (memberName || memberPhone) {
+                        members.push('Member ' + n + ': ' + escapeHtml(memberName || '—') +
+                            (memberPhone ? ' (' + escapeHtml(memberPhone) + ')' : ''));
+                    }
+                }
 
                 html += `
                     <div class="registration-item">
@@ -2324,6 +2395,9 @@
                                 <span>⛪ ${church}</span>
                                 <span>📍 ${county}</span>
                             </div>
+                            ${extras.length ? '<div class="meta" style="margin-top:4px;">' + extras.map(e => `<span>${e}</span>`).join('') + '</div>' : ''}
+                            ${members.length ? '<div class="meta" style="margin-top:4px;">' + members.map(m => `<span>👥 ${m}</span>`).join('') + '</div>' : ''}
+                            ${reg.prayer_request ? '<div class="meta" style="margin-top:4px;"><span>🙏 ' + escapeHtml(reg.prayer_request) + '</span></div>' : ''}
                         </div>
                         <div style="text-align: right;">
                             <div><span class="badge-ticket">${ticket}</span></div>
@@ -2613,11 +2687,10 @@
 
                 // Simulate processing
                 registerSubmit.textContent = '⏳ Processing...';
-                
-                // Use setTimeout to simulate async operation
-                setTimeout(() => {
-                    const saveResult = saveRegistration(payload);
-                    
+
+                (async () => {
+                    const saveResult = await saveRegistration(payload);
+
                     if (!saveResult.success) {
                         alert('⚠️ Booking could not be saved. Please try again.');
                         registerSubmit.textContent = 'Book Ticket';
@@ -2628,7 +2701,7 @@
                     showTicket(payload);
                     alert('✅ Booking successful! Your ticket is ready below.\n📁 Booking saved to ' + saveResult.source +
                         '\n💳 Pay via M-Pesa Till: 216445');
-                    
+
                     if (document.getElementById('admin').classList.contains('show')) {
                         loadRegistrations();
                     }
@@ -2639,7 +2712,7 @@
 
                     registerSubmit.textContent = 'Book Ticket';
                     registerSubmit.disabled = false;
-                }, 1000);
+                })();
 
             } catch (error) {
                 alert('⚠️ An error occurred. Please try again.');
