@@ -1,0 +1,2670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UNITED IN CHRIST | Breaking the Ice</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js">
+    </script>
+    <!-- html2pdf for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+    </script>
+    <style>
+        /* ----- RESET & VARIABLES ----- */
+        :root {
+            --bg: #071826;
+            --bg-soft: #102b3d;
+            --blue-ice: #a7d8ff;
+            --blue-deep: #195087;
+            --navy: #071b2d;
+            --navy-2: #10283a;
+            --royal: #234d92;
+            --purple: #553b94;
+            --gold: #d7b46a;
+            --gold-soft: #f3e39d;
+            --text: #eefaff;
+            --text-soft: #b9d8de;
+            --text-muted: #9ab1bd;
+            --ice: #eafaff;
+            --line: rgba(255, 255, 255, 0.12);
+            --panel: rgba(255, 255, 255, 0.08);
+            --panel-strong: rgba(255, 255, 255, 0.14);
+            --shadow: rgba(0, 22, 36, 0.34);
+            --success: #8fdba4;
+            --danger: #ffb9b9;
+            --ticket-bg: #f5f3f0;
+            --ticket-text: #1a1a2e;
+            --ticket-accent: #1e3a5f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 70% 5%, rgba(96, 166, 245, 0.20), transparent 20%),
+                radial-gradient(circle at 84% 20%, rgba(128, 96, 220, 0.15), transparent 30%),
+                linear-gradient(145deg, var(--bg), var(--navy-2));
+            min-height: 100vh;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: -10%;
+            pointer-events: none;
+            background-image:
+                radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+                radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+            background-position: 0 0, 25px 25px;
+            background-size: 72px 72px, 72px 72px;
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        img {
+            max-width: 100%;
+        }
+
+        .container {
+            width: min(1180px, calc(100% - 64px));
+            margin: 0 auto;
+        }
+
+        /* ----- TOP BAR ----- */
+        .topbar {
+            border-bottom: 1px solid var(--line);
+            background: rgba(18, 42, 51, 0.64);
+            backdrop-filter: blur(14px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .topbar-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 84px;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--blue-ice), var(--royal));
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: 1px;
+            box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.4), 0 0 16px rgba(24, 155, 222, 0.35);
+        }
+        .brand-text .company {
+            display: block;
+            font-size: 0.87rem;
+            letter-spacing: 0.20em;
+            color: var(--text-soft);
+            text-transform: uppercase;
+        }
+        .brand-text .event {
+            display: block;
+            font-size: 1.10rem;
+            font-weight: 800;
+            margin-top: 4px;
+            color: white;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .main-nav a {
+            font-size: 0.88rem;
+            color: var(--text-soft);
+            transition: color 0.2s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        .main-nav a::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -6px;
+            height: 2px;
+            border-radius: 99px;
+            transform: scaleX(0);
+            transform-origin: center;
+            background: linear-gradient(90deg, var(--blue-ice), var(--gold-soft));
+            transition: transform 0.2s ease;
+        }
+        .main-nav a:hover,
+        .main-nav a.active {
+            color: white;
+        }
+        .main-nav a:hover::after,
+        .main-nav a.active::after {
+            transform: scaleX(1);
+        }
+        .nav-cta {
+            padding: 11px 20px;
+            border-radius: 999px;
+            font-weight: 700;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: linear-gradient(135deg, var(--royal), var(--purple));
+            font-size: 0.82rem;
+            box-shadow: 0 12px 30px rgba(32, 74, 130, 0.3);
+        }
+        .nav-toggle {
+            display: none;
+            background: transparent;
+            border: 1px solid var(--line);
+            color: white;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* ----- HERO ----- */
+        .hero {
+            padding: 88px 0 62px;
+            position: relative;
+        }
+        .hero-wrap {
+            display: grid;
+            grid-template-columns: minmax(520px, 1.2fr) minmax(420px, 0.88fr);
+            gap: 46px;
+            align-items: center;
+        }
+        .hero-copy {
+            position: relative;
+        }
+        .kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.80rem;
+            font-weight: 800;
+            letter-spacing: 0.20em;
+            color: var(--blue-ice);
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+        .kicker::before {
+            content: "";
+            width: 34px;
+            height: 2px;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--gold), var(--blue-ice));
+        }
+        h1 {
+            font-size: clamp(3.3rem, 6vw, 4.85rem);
+            line-height: 0.98;
+            margin-bottom: 22px;
+            letter-spacing: -0.04em;
+        }
+        .hero h1 span {
+            color: var(--blue-ice);
+        }
+        .tagline {
+            font-size: clamp(1.06rem, 2.6vw, 1.43rem);
+            color: var(--text-soft);
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 28px;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 34px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            padding: 13px 24px;
+            border-radius: 999px;
+            font-size: 0.84rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-primary {
+            color: white;
+            background: linear-gradient(135deg, var(--blue-deep), var(--purple));
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: 0 11px 34px rgba(36, 86, 137, 0.38);
+        }
+        .btn-secondary {
+            color: white;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.36);
+        }
+        .btn-plain {
+            background: linear-gradient(135deg, var(--gold), #9f7427);
+            color: #091927;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #1a8a4a, #0f6b34);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #b13a3a, #7a2323);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        .event-highlights {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            color: var(--text-soft);
+            font-size: 0.83rem;
+        }
+        .event-highlights .item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .event-highlights .item i {
+            color: var(--gold-soft);
+            font-size: 1rem;
+        }
+
+        .hero-panel {
+            position: relative;
+        }
+        .hero-card {
+            position: relative;
+            min-height: 520px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.42);
+            background: linear-gradient(140deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04));
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+            box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.15), 0 22px 60px var(--shadow);
+        }
+        .hero-card::before {
+            content: "";
+            position: absolute;
+            width: 480px;
+            height: 480px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            top: -118px;
+            right: -146px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.20), transparent);
+        }
+        .event-cover {
+            min-height: 280px;
+            background-image: linear-gradient(120deg, rgba(44, 70, 112, 0.62), rgba(34, 24, 78, 0.76)), url("https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&q=80");
+            background-size: cover;
+            background-position: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.38);
+        }
+        .hero-card-content {
+            padding: 34px;
+        }
+        .event-date-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.78rem;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: var(--gold-soft);
+        }
+        .event-date-badge strong {
+            color: white;
+            font-size: 1rem;
+            letter-spacing: 0.10em;
+        }
+        .hero-card h2 {
+            margin-top: 26px;
+            font-size: 2rem;
+            line-height: 1.1;
+        }
+        .hero-card p {
+            color: var(--text-soft);
+            margin-top: 14px;
+            font-size: 0.92rem;
+        }
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(100px, auto));
+            gap: 12px;
+            margin-top: 28px;
+        }
+        .hero-stats .stat {
+            border-radius: 14px;
+            padding: 14px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+        }
+        .hero-stats .stat .value {
+            font-size: 1.68rem;
+            font-weight: 800;
+            line-height: 1;
+            color: white;
+        }
+        .hero-stats .stat .label {
+            display: block;
+            font-size: 0.72rem;
+            margin-top: 7px;
+            color: var(--text-muted);
+            letter-spacing: 0.20em;
+            text-transform: uppercase;
+        }
+
+        .section {
+            padding: 72px 0;
+        }
+        .section-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 34px;
+            flex-wrap: wrap;
+        }
+        .section-title {
+            font-size: clamp(2rem, 4vw, 2.72rem);
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+        }
+        .section-subtitle {
+            color: var(--text-soft);
+            font-size: 0.96rem;
+            max-width: 620px;
+        }
+        .section-title span {
+            color: var(--blue-ice);
+        }
+
+        .event-details-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        .detail-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 28px 24px;
+            min-height: 190px;
+            backdrop-filter: blur(14px);
+            box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.08);
+        }
+        .detail-card .icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.30);
+            margin-bottom: 22px;
+            color: var(--gold-soft);
+            font-size: 1.42rem;
+        }
+        .detail-card h3 {
+            font-size: 1rem;
+            letter-spacing: 0.13em;
+            color: white;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .detail-card p {
+            color: var(--text-soft);
+            font-size: 0.88rem;
+        }
+
+        .about-layout {
+            display: grid;
+            grid-template-columns: minmax(420px, 0.98fr) minmax(380px, 0.86fr);
+            gap: 34px;
+            align-items: center;
+        }
+        .about-copy {
+            background: var(--panel);
+            border-radius: 24px;
+            border: 1px solid var(--line);
+            padding: 30px;
+            backdrop-filter: blur(14px);
+        }
+        .about-copy p {
+            color: var(--text-soft);
+            margin: 14px 0;
+        }
+        .values-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(160px, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .values-list .value-item {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            color: var(--text-soft);
+            background: rgba(255, 255, 255, 0.05);
+            font-size: 0.84rem;
+        }
+
+        .image-panel {
+            background: linear-gradient(145deg, #173b54, #1e3f77 56%, #211d59);
+            border-radius: 24px;
+            min-height: 420px;
+            border: 1px solid rgba(255, 255, 255, 0.36);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 30px 74px rgba(0, 0, 0, 0.33);
+        }
+        .image-panel .image-bg {
+            background-image: linear-gradient(140deg, rgba(4, 30, 54, 0.55), rgba(19, 24, 70, 0.65)), url("https://images.unsplash.com/photo-1515169065933-99f6d4ca2b95?auto=format&fit=crop&q=80");
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+            inset: 0;
+        }
+        .image-panel .content {
+            position: relative;
+            z-index: 2;
+            padding: 28px;
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            justify-content: end;
+        }
+        .image-panel h3 {
+            font-size: 2rem;
+            line-height: 1.05;
+            margin: 0 0 22px;
+        }
+        .image-panel .verse {
+            font-size: 0.90rem;
+            color: var(--text-soft);
+            line-height: 1.88;
+        }
+
+        .tickets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(210px, 1fr));
+            gap: 26px;
+        }
+        .ticket-card {
+            border-radius: 26px;
+            padding: 28px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(14px);
+            min-height: 340px;
+        }
+        .ticket-card.featured {
+            background: linear-gradient(135deg, rgba(50, 112, 173, 0.65), rgba(87, 58, 151, 0.75));
+            border-color: rgba(255, 255, 255, 0.54);
+            transform: translateY(-12px);
+        }
+        .ticket-card .ticket-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .ticket-card h3 {
+            font-size: 1.20rem;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+        }
+        .ticket-card .price {
+            font-weight: 900;
+            font-size: 2.10rem;
+            line-height: 1;
+            margin: 20px 0;
+            color: white;
+        }
+        .ticket-card .price span {
+            font-size: 0.82rem;
+            color: var(--text-soft);
+        }
+        .ticket-card ul {
+            list-style: none;
+            margin-top: 12px;
+        }
+        .ticket-card li {
+            position: relative;
+            padding-left: 22px;
+            color: var(--text-soft);
+            font-size: 0.84rem;
+            margin-bottom: 10px;
+        }
+        .ticket-card li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: 900;
+        }
+        .ticket-card .ticket-btn {
+            margin-top: 30px;
+            width: 100%;
+        }
+
+        .countdown-strip {
+            padding: 24px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, rgba(27, 56, 90, 0.85), rgba(43, 45, 92, 0.88));
+            border: 1px solid var(--line);
+            margin-top: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .countdown-title {
+            font-size: 0.76rem;
+            letter-spacing: 0.26em;
+            text-transform: uppercase;
+            color: var(--text-soft);
+        }
+        .countdown-time {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+        }
+        .time-box {
+            min-width: 80px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--line);
+            text-align: center;
+        }
+        .time-box strong {
+            display: block;
+            font-size: 1.60rem;
+            color: white;
+            line-height: 1;
+        }
+        .time-box span {
+            font-size: 0.68rem;
+            letter-spacing: 0.28em;
+            color: var(--text-soft);
+            text-transform: uppercase;
+        }
+
+        .register-section {
+            background: radial-gradient(circle at 50% 20%, rgba(67, 109, 183, 0.28), transparent), transparent;
+        }
+        .register-layout {
+            display: grid;
+            grid-template-columns: minmax(520px, 1fr) minmax(340px, 0.76fr);
+            gap: 28px;
+        }
+        .register-form-wrap,
+        .payment-summary {
+            background: var(--panel);
+            border-radius: 24px;
+            border: 1px solid var(--line);
+            backdrop-filter: blur(12px);
+            padding: 30px;
+        }
+        .form-title {
+            font-size: 1.32rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .form-title .small-tag {
+            font-size: 0.68rem;
+            color: var(--text-soft);
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 6px 12px;
+        }
+
+        form .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(200px, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .field.full {
+            grid-column: 1 / -1;
+        }
+        label {
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            color: var(--text-soft);
+            letter-spacing: 0.28em;
+        }
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.26);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            padding: 12px 13px;
+            outline: none;
+            font: inherit;
+        }
+        .field input::placeholder,
+        .field textarea::placeholder {
+            color: rgba(255, 255, 255, 0.58);
+        }
+        .field textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: var(--blue-ice);
+            box-shadow: 0 0 0 3px rgba(147, 212, 255, 0.24);
+        }
+        .field select option {
+            color: #132b38;
+        }
+
+        .group-member-block {
+            display: none;
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 18px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--line);
+        }
+        .group-member-block.active {
+            display: block;
+        }
+        .group-member-block h4 {
+            font-size: 0.84rem;
+            letter-spacing: 0.20em;
+            text-transform: uppercase;
+            color: var(--text-soft);
+            margin-bottom: 14px;
+        }
+        .group-member-block .subgrid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(180px, 1fr));
+            gap: 14px;
+        }
+
+        .money-box {
+            border: 1px solid var(--line);
+            padding: 14px;
+            border-radius: 14px;
+            margin-top: 14px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .money-box .label {
+            font-size: 0.73rem;
+            letter-spacing: 0.20em;
+            color: var(--text-soft);
+            text-transform: uppercase;
+        }
+        .money-box .amount {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-top: 6px;
+        }
+
+        .payment-summary {
+            align-self: start;
+        }
+        .payment-summary h3 {
+            font-size: 1.10rem;
+            margin-bottom: 14px;
+        }
+        .summary-line {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--line);
+            padding: 12px 0;
+            color: var(--text-soft);
+            font-size: 0.83rem;
+        }
+        .summary-line:last-child {
+            border-bottom: none;
+        }
+        .summary-line strong {
+            color: white;
+        }
+        .order-total {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.30);
+            background: linear-gradient(135deg, rgba(31, 127, 144, 0.34), rgba(78, 61, 154, 0.34));
+        }
+        .cta-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .cta-row .btn {
+            flex: 1;
+        }
+
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 0.88fr 1fr;
+            gap: 24px;
+        }
+        .contact-panel {
+            background: var(--panel);
+            border-radius: 24px;
+            border: 1px solid var(--line);
+            padding: 28px;
+        }
+        .contact-panel h3 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+        .contact-panel p,
+        .contact-panel li {
+            color: var(--text-soft);
+            font-size: 0.88rem;
+        }
+        .contact-list {
+            list-style: none;
+            padding-top: 16px;
+        }
+        .contact-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .contact-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .map-panel {
+            border-radius: 24px;
+            min-height: 390px;
+            background: linear-gradient(135deg, rgba(33, 90, 126, 0.82), rgba(64, 32, 104, 0.82));
+            border: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .map-panel::before {
+            content: "";
+            position: absolute;
+            inset: -40%;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.28) 1px, transparent 1px);
+            background-size: 34px 34px;
+            opacity: 0.50;
+        }
+        .venue-box {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            padding: 30px;
+            max-width: 440px;
+        }
+        .venue-box h3 {
+            font-size: 1.64rem;
+            margin-bottom: 12px;
+        }
+        .venue-box p {
+            color: var(--text-soft);
+            font-size: 0.88rem;
+        }
+
+        .ticket-display {
+            display: none;
+            margin-top: 40px;
+            padding: 30px;
+            background: var(--panel-strong);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+        }
+        .ticket-display.visible {
+            display: block;
+        }
+
+        .ticket-paper {
+            max-width: 620px;
+            margin: 0 auto;
+            background: var(--ticket-bg);
+            border-radius: 24px;
+            padding: 32px 36px;
+            color: var(--ticket-text);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+            position: relative;
+            border: 2px solid var(--gold);
+        }
+        .ticket-paper .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed #ccc;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+        }
+        .ticket-paper .ticket-header .org {
+            font-weight: 800;
+            font-size: 1.0rem;
+            letter-spacing: 0.08em;
+            color: var(--ticket-accent);
+        }
+        .ticket-paper .ticket-header .badge {
+            background: var(--gold);
+            color: #1a1a2e;
+            font-weight: 800;
+            font-size: 0.70rem;
+            padding: 4px 14px;
+            border-radius: 99px;
+            letter-spacing: 0.08em;
+        }
+        .ticket-paper .event-name {
+            font-size: 1.8rem;
+            font-weight: 900;
+            line-height: 1.1;
+            color: var(--ticket-accent);
+            margin-bottom: 4px;
+        }
+        .ticket-paper .event-sub {
+            color: #555;
+            font-size: 0.95rem;
+            margin-bottom: 18px;
+        }
+        .ticket-paper .ticket-body {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 24px;
+            align-items: center;
+        }
+        .ticket-paper .ticket-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .ticket-paper .ticket-details .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #e8e5e0;
+            font-size: 0.85rem;
+        }
+        .ticket-paper .ticket-details .row .lbl {
+            color: #777;
+            font-weight: 500;
+        }
+        .ticket-paper .ticket-details .row .val {
+            font-weight: 700;
+        }
+        .ticket-paper .qr-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .ticket-paper .qr-wrap #qrcode {
+            background: white;
+            padding: 6px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
+        }
+        .ticket-paper .qr-wrap .ticket-id {
+            font-size: 0.60rem;
+            color: #888;
+            letter-spacing: 0.10em;
+            text-align: center;
+        }
+        .ticket-paper .ticket-footer {
+            margin-top: 20px;
+            border-top: 2px dashed #ccc;
+            padding-top: 14px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.70rem;
+            color: #888;
+        }
+        .ticket-paper .ticket-footer .verse {
+            font-style: italic;
+            color: #555;
+        }
+
+        .ticket-actions {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .social-follow {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+            padding: 6px 0;
+        }
+        .social-follow .label {
+            font-size: 0.72rem;
+            letter-spacing: 0.20em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .social-follow a {
+            font-size: 0.85rem;
+            color: var(--blue-ice);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: background 0.2s;
+        }
+        .social-follow a:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        /* Admin Dashboard */
+        #admin {
+            display: none;
+        }
+        #admin.show {
+            display: block;
+        }
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .admin-stat-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 16px 20px;
+            text-align: center;
+        }
+        .admin-stat-card .number {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--blue-ice);
+        }
+        .admin-stat-card .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            margin-top: 4px;
+            display: block;
+        }
+        .registration-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            transition: background 0.2s;
+        }
+        .registration-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .registration-item .name {
+            font-weight: 700;
+            color: white;
+        }
+        .registration-item .meta {
+            font-size: 0.82rem;
+            color: var(--text-soft);
+        }
+        .registration-item .meta span {
+            margin-right: 12px;
+        }
+        .registration-item .badge-ticket {
+            font-size: 0.65rem;
+            padding: 2px 10px;
+            border-radius: 99px;
+            background: var(--royal);
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .registration-item .time {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
+        .admin-toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .admin-toolbar .btn {
+            padding: 8px 18px;
+            font-size: 0.75rem;
+        }
+
+        /* Password Modal */
+        .password-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .password-overlay.active {
+            display: flex;
+        }
+        .password-modal {
+            background: var(--bg-soft);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 40px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+        .password-modal h2 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: white;
+        }
+        .password-modal p {
+            color: var(--text-soft);
+            margin-bottom: 24px;
+            font-size: 0.9rem;
+        }
+        .password-modal .field {
+            margin-bottom: 16px;
+        }
+        .password-modal .field input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            letter-spacing: 4px;
+        }
+        .password-modal .field input:focus {
+            border-color: var(--blue-ice);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(167, 216, 255, 0.2);
+        }
+        .password-modal .field input::placeholder {
+            letter-spacing: 0;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .password-modal .error-msg {
+            color: var(--danger);
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            min-height: 24px;
+        }
+        .password-modal .btn {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        .password-modal .btn-secondary {
+            width: 100%;
+        }
+
+        /* PDF Export Styles */
+        .pdf-export-container {
+            background: white;
+            color: #1a1a2e;
+            padding: 30px;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+        .pdf-export-container .pdf-header {
+            text-align: center;
+            border-bottom: 2px solid #1e3a5f;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        .pdf-export-container .pdf-header h1 {
+            font-size: 24px;
+            color: #1e3a5f;
+            margin-bottom: 4px;
+        }
+        .pdf-export-container .pdf-header p {
+            color: #555;
+            font-size: 14px;
+        }
+        .pdf-export-container .pdf-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .pdf-export-container .pdf-stat {
+            background: #f5f3f0;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .pdf-export-container .pdf-stat .num {
+            font-size: 22px;
+            font-weight: 900;
+            color: #1e3a5f;
+        }
+        .pdf-export-container .pdf-stat .lbl {
+            font-size: 11px;
+            color: #777;
+            text-transform: uppercase;
+        }
+        .pdf-export-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .pdf-export-container table th {
+            background: #1e3a5f;
+            color: white;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        .pdf-export-container table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #e8e5e0;
+        }
+        .pdf-export-container table tr:nth-child(even) {
+            background: #f9f8f6;
+        }
+        .pdf-export-container .pdf-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            border-top: 1px solid #e8e5e0;
+            padding-top: 12px;
+        }
+
+        footer {
+            padding: 50px 0;
+            border-top: 1px solid var(--line);
+            background: rgba(4, 14, 24, 0.30);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 28px;
+            align-items: start;
+        }
+        .footer-title {
+            letter-spacing: 0.20em;
+            text-transform: uppercase;
+            font-size: 0.74rem;
+            color: var(--text-soft);
+        }
+        .footer-links {
+            display: grid;
+            gap: 9px;
+            color: var(--text-muted);
+            font-size: 0.84rem;
+        }
+        .footer-links a:hover {
+            color: white;
+        }
+        .copyright {
+            margin-top: 24px;
+            color: var(--text-muted);
+            font-size: 0.76rem;
+        }
+
+        /* My Tickets Section */
+        #myTickets {
+            display: none;
+        }
+        #myTickets.show {
+            display: block;
+        }
+        .my-ticket-item {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 20px;
+            align-items: center;
+        }
+        .my-ticket-item .ticket-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .my-ticket-item .ticket-info .name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+        }
+        .my-ticket-item .ticket-info .detail {
+            color: var(--text-soft);
+            font-size: 0.85rem;
+        }
+        .my-ticket-item .ticket-actions-mini {
+            display: flex;
+            gap: 10px;
+        }
+        .my-ticket-item .ticket-actions-mini .btn {
+            padding: 8px 16px;
+            font-size: 0.75rem;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #ticketDisplay,
+            #ticketDisplay * {
+                visibility: visible;
+            }
+            #ticketDisplay {
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 20px;
+                background: white !important;
+                backdrop-filter: none !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                display: flex !important;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                background: #f5f3f0 !important;
+            }
+            #ticketDisplay .ticket-paper {
+                max-width: 620px;
+                margin: 0 auto;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+                border: 2px solid #d7b46a;
+            }
+            #ticketDisplay .ticket-actions {
+                display: none !important;
+            }
+            .topbar,
+            .hero,
+            .section:not(#register),
+            footer,
+            .register-layout,
+            .register-form-wrap,
+            .payment-summary,
+            .section-header,
+            .countdown-strip,
+            .tickets-grid,
+            .about-layout,
+            .contact-layout,
+            .ticket-display .ticket-actions {
+                display: none !important;
+            }
+            #register {
+                padding: 0 !important;
+                background: transparent !important;
+            }
+            .container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .register-section {
+                background: transparent !important;
+                padding: 0 !important;
+            }
+            .ticket-display {
+                background: transparent !important;
+                backdrop-filter: none !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .ticket-paper .ticket-header .badge {
+                background: #d7b46a !important;
+                color: #1a1a2e !important;
+            }
+        }
+
+        @media (max-width: 1020px) {
+            .hero-wrap,
+            .about-layout,
+            .register-layout,
+            .contact-layout {
+                grid-template-columns: 1fr;
+            }
+            .event-details-grid {
+                grid-template-columns: repeat(2, minmax(220px, 1fr));
+            }
+            .tickets-grid {
+                grid-template-columns: 1fr;
+            }
+            .ticket-card.featured {
+                transform: none;
+            }
+            .hero-card {
+                min-height: auto;
+            }
+            h1 {
+                font-size: clamp(2.75rem, 10vw, 4rem);
+            }
+            .ticket-paper .ticket-body {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .ticket-paper .qr-wrap {
+                margin-top: 12px;
+            }
+            .registration-item {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+            .registration-item .time {
+                text-align: left;
+            }
+            .pdf-export-container .pdf-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .my-ticket-item {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .my-ticket-item .ticket-actions-mini {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 740px) {
+            .topbar-inner {
+                min-height: auto;
+                padding: 12px 0;
+            }
+            .nav-toggle {
+                display: inline-flex;
+                align-items: center;
+            }
+            .main-nav {
+                position: absolute;
+                top: 84px;
+                left: 20px;
+                right: 20px;
+                display: none;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                padding: 24px;
+                background: rgba(9, 30, 47, 0.98);
+                border-radius: 16px;
+                border: 1px solid var(--line);
+            }
+            .main-nav.open {
+                display: flex;
+            }
+            .hero {
+                padding-top: 30px;
+            }
+            .event-details-grid,
+            .tickets-grid,
+            .values-list,
+            form .form-grid,
+            .group-member-block .subgrid {
+                grid-template-columns: 1fr;
+            }
+            .hero-stats {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                width: min(1180px, calc(100% - 24px));
+            }
+            .ticket-paper {
+                padding: 20px;
+            }
+            .ticket-paper .event-name {
+                font-size: 1.3rem;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .password-modal {
+                padding: 28px 20px;
+            }
+            .pdf-export-container .pdf-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            .pdf-export-container table {
+                font-size: 10px;
+            }
+            .pdf-export-container table th,
+            .pdf-export-container table td {
+                padding: 4px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a class="brand" href="#">
+                <div class="brand-icon">UIC</div>
+                <div class="brand-text">
+                    <span class="company">UNITED IN CHRIST</span>
+                    <span class="event">Breaking the Ice</span>
+                </div>
+            </a>
+            <button class="nav-toggle" id="navToggle">☰</button>
+            <nav class="main-nav" id="mainNav">
+                <a class="active" href="#">Home</a>
+                <a href="#about">About</a>
+                <a href="#tickets">Tickets</a>
+                <a href="#register">Register</a>
+                <a href="#myTicketsSection">My Tickets</a>
+                <a href="#contact">Contact</a>
+                <a href="#" onclick="event.preventDefault(); requestAdminAccess();">📊 Admin</a>
+                <a class="nav-cta" href="#register">Book Now</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Password Modal -->
+    <div class="password-overlay" id="passwordOverlay">
+        <div class="password-modal">
+            <h2>🔐 Admin Access</h2>
+            <p>Enter the admin password to view bookings.</p>
+            <div class="field">
+                <input type="password" id="adminPassword" placeholder="Enter password" maxlength="20" autocomplete="off">
+            </div>
+            <div class="error-msg" id="passwordError"></div>
+            <button class="btn btn-primary" id="passwordSubmitBtn">Unlock Dashboard</button>
+            <button class="btn btn-secondary" onclick="closePasswordModal()">Cancel</button>
+        </div>
+    </div>
+
+    <section class="hero">
+        <div class="container hero-wrap">
+            <div class="hero-copy">
+                <div class="kicker">School Uniform Edition</div>
+                <h1>UNITED IN CHRIST <span>|</span><br>BREAKING THE ICE</h1>
+                <p class="tagline">"Come as strangers. Leave as a community."</p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#register">Book Now</a>
+                    <a class="btn btn-secondary" href="#tickets">View Tickets</a>
+                </div>
+                <div class="event-highlights">
+                    <div class="item"><i>✓</i> 22 August 2026</div>
+                    <div class="item"><i>✓</i> 9:00 AM - 2:00 PM</div>
+                    <div class="item"><i>✓</i> Abundant Life Worship Church, Kamulu</div>
+                </div>
+            </div>
+            <aside class="hero-panel">
+                <div class="hero-card">
+                    <div class="event-cover"></div>
+                    <div class="hero-card-content">
+                        <div class="event-date-badge">NEXT GATHERING <strong>22 AUG 2026</strong></div>
+                        <h2>Breaking the Ice</h2>
+                        <p>Worship, fellowship, Bible study, games and meaningful conversation for young people ready to build genuine community.</p>
+                        <div class="hero-stats">
+                            <div class="stat"><span class="value">09:00</span><span class="label">Start Time</span></div>
+                            <div class="stat"><span class="value">KSh 99</span><span class="label">Single</span></div>
+                            <div class="stat"><span class="value">3</span><span class="label">ICE Themes</span></div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <div class="kicker">Event Details</div>
+                    <h2 class="section-title">Gather with <span>purpose</span></h2>
+                </div>
+                <div class="section-subtitle">A day of joyful worship, thoughtful Bible study, practical fellowship, and a fresh sense of belonging.</div>
+            </div>
+            <div class="event-details-grid">
+                <article class="detail-card"><div class="icon">◎</div><h3>Date</h3><p>22 August 2026</p></article>
+                <article class="detail-card"><div class="icon">◌</div><h3>Time</h3><p>9:00 AM – 2:00 PM</p></article>
+                <article class="detail-card"><div class="icon">⌁</div><h3>Venue</h3><p>Abundant Life Worship Church, Kamulu</p></article>
+                <article class="detail-card"><div class="icon">✧</div><h3>Dress Code</h3><p>School Uniform</p></article>
+            </div>
+            <div class="countdown-strip">
+                <div><div class="countdown-title">Countdown to Registration Day</div></div>
+                <div class="countdown-time">
+                    <div class="time-box"><strong id="days">00</strong><span>Days</span></div>
+                    <div class="time-box"><strong id="hours">00</strong><span>Hours</span></div>
+                    <div class="time-box"><strong id="minutes">00</strong><span>Minutes</span></div>
+                    <div class="time-box"><strong id="seconds">00</strong><span>Seconds</span></div>
+                </div>
+                <a class="btn btn-secondary" href="#register">Reserve a Seat</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="section">
+        <div class="container about-layout">
+            <div class="about-copy">
+                <div class="kicker">About United in Christ</div>
+                <h2 class="section-title">Who We Are</h2>
+                <p>United in Christ is a youth community that creates spaces where young people can encounter Christ, discover purpose, and build friendship.</p>
+                <p>Our vision is to cultivate a generation that knows God, loves people, and lives with courage in everyday obedience.</p>
+                <div class="values-list">
+                    <div class="value-item">Vision</div>
+                    <div class="value-item">Mission</div>
+                    <div class="value-item">Core Values</div>
+                    <div class="value-item">Youth Fellowship</div>
+                </div>
+                <div class="cta-row">
+                    <a class="btn btn-primary" href="#register">Join the Gathering</a>
+                    <a class="btn btn-secondary" href="#tickets">See Packages</a>
+                </div>
+            </div>
+            <aside class="image-panel">
+                <div class="image-bg"></div>
+                <div class="content">
+                    <div class="kicker">Theme Scripture</div>
+                    <h3>"Come as strangers. Leave as a community."</h3>
+                    <p class="verse">Breaking the Ice is a space for young people to connect across churches, cultures and backgrounds through worship, prayer, learning, and friendship.</p>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <section id="activities" class="section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <div class="kicker">Activities</div>
+                    <h2 class="section-title">A day of <span>connection</span></h2>
+                </div>
+            </div>
+            <div class="event-details-grid">
+                <article class="detail-card"><div class="icon">♬</div><h3>Praise & Worship</h3><p>Encounter God through songs that unite us.</p></article>
+                <article class="detail-card"><div class="icon">✦</div><h3>Bible Exposition</h3><p>Walk through Scripture with clarity and direction.</p></article>
+                <article class="detail-card"><div class="icon">☰</div><h3>Bible Debate</h3><p>Build conviction and courage through conversation.</p></article>
+                <article class="detail-card"><div class="icon">☻</div><h3>Fellowship</h3><p>Meet new people and discover faithful friendships.</p></article>
+            </div>
+        </div>
+    </section>
+
+    <section id="tickets" class="section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <div class="kicker">Ticket Packages</div>
+                    <h2 class="section-title">Choose your <span>seat</span></h2>
+                </div>
+                <div class="section-subtitle">Book your ticket and pay via M-Pesa Till 216445</div>
+            </div>
+            <div class="tickets-grid">
+                <article class="ticket-card">
+                    <div class="ticket-title"><h3>Single</h3><span class="icon">1</span></div>
+                    <div class="price">KSh 99 <span>/ attendee</span></div>
+                    <ul><li>Conference access</li><li>Worship & Bible study</li><li>Games & fellowship</li><li>Event material</li></ul>
+                    <a class="btn btn-secondary ticket-btn" href="#register">Book Now</a>
+                </article>
+                <article class="ticket-card featured">
+                    <div class="ticket-title"><h3>Group of 3</h3><span class="icon">3</span></div>
+                    <div class="price">KSh 199 <span>/ group</span></div>
+                    <ul><li>Three registrations</li><li>Shared ice-breaking experience</li><li>Fellowship session access</li><li>Group event support</li></ul>
+                    <a class="btn btn-plain ticket-btn" href="#register">Book Now</a>
+                </article>
+                <article class="ticket-card">
+                    <div class="ticket-title"><h3>Group of 5</h3><span class="icon">5</span></div>
+                    <div class="price">KSh 349 <span>/ group</span></div>
+                    <ul><li>Five registrations</li><li>Fellowship & games</li><li>Attendance tracking</li><li>Checklist-ready worship day</li></ul>
+                    <a class="btn btn-secondary ticket-btn" href="#register">Book Now</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="register" class="section register-section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <div class="kicker">Booking</div>
+                    <h2 class="section-title">Book your <span>ticket</span></h2>
+                </div>
+                <div class="section-subtitle">Fill in your details and pay via M-Pesa Till 216445</div>
+            </div>
+
+            <div class="register-layout">
+                <div class="register-form-wrap">
+                    <div class="form-title">
+                        <span>Booking Form</span>
+                        <span class="small-tag">Breaking the Ice</span>
+                    </div>
+
+                    <form id="registrationForm">
+                        <div class="form-grid">
+                            <div class="field full">
+                                <label for="fullName">Full Name *</label>
+                                <input id="fullName" name="full_name" type="text" placeholder="Full Name" required>
+                            </div>
+                            <div class="field">
+                                <label for="email">Email</label>
+                                <input id="email" name="email" type="email" placeholder="name@example.com">
+                            </div>
+                            <div class="field">
+                                <label for="phone">Phone Number *</label>
+                                <input id="phone" name="phone" type="tel" placeholder="07xx xxx xxx" required>
+                            </div>
+                            <div class="field">
+                                <label for="whatsapp">WhatsApp Number</label>
+                                <input id="whatsapp" name="whatsapp" type="tel" placeholder="07xx xxx xxx">
+                            </div>
+                            <div class="field">
+                                <label for="gender">Gender</label>
+                                <select id="gender" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="age">Age Group</label>
+                                <select id="age" name="age_group">
+                                    <option value="">Select Age</option>
+                                    <option value="Below 18">Below 18</option>
+                                    <option value="18-25">18-25</option>
+                                    <option value="26-35">26-35</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="church">Church</label>
+                                <input id="church" name="church" type="text" placeholder="Church Name">
+                            </div>
+                            <div class="field">
+                                <label for="churchLocation">Church Location</label>
+                                <input id="churchLocation" name="church_location" type="text" placeholder="Church Location">
+                            </div>
+                            <div class="field">
+                                <label for="county">County</label>
+                                <input id="county" name="county" type="text" placeholder="County">
+                            </div>
+                            <div class="field">
+                                <label for="ticketType">Ticket Type *</label>
+                                <select id="ticketType" name="ticket_type" required>
+                                    <option value="single">Single - KSh 99</option>
+                                    <option value="group3">Group of 3 - KSh 199</option>
+                                    <option value="group5">Group of 5 - KSh 349</option>
+                                </select>
+                            </div>
+                            <div class="field full">
+                                <label for="prayerRequest">Prayer Request</label>
+                                <textarea id="prayerRequest" name="prayer_request" placeholder="Optional prayer request"></textarea>
+                            </div>
+
+                            <div class="field full">
+                                <label for="instagram">Instagram (optional)</label>
+                                <input id="instagram" name="instagram" type="text" placeholder="@yourusername">
+                            </div>
+
+                            <div class="field full">
+                                <label for="tiktok">TikTok (optional)</label>
+                                <input id="tiktok" name="tiktok" type="text" placeholder="@yourusername">
+                            </div>
+
+                            <div class="field full">
+                                <div class="social-follow">
+                                    <span class="label">Follow us</span>
+                                    <a href="https://instagram.com/unitedinchrist_ke" target="_blank">@unitedinchrist_ke</a>
+                                    <a href="https://instagram.com/joe_101._" target="_blank">@joe_101._</a>
+                                    <a href="https://instagram.com/ctrl.mbugua" target="_blank">@ctrl.mbugua</a>
+                                    <a href="https://instagram.com/gichuru_exe" target="_blank">@gichuru_exe</a>
+                                </div>
+                            </div>
+
+                            <div id="groupMembers" class="group-member-block">
+                                <h4>Group Members</h4>
+                                <div class="subgrid">
+                                    <div class="field"><label for="member2">Member 2 Full Name</label><input id="member2" name="member2" type="text" placeholder="Full Name"></div>
+                                    <div class="field"><label for="member2Phone">Member 2 Phone</label><input id="member2Phone" name="member2_phone" type="tel" placeholder="Phone"></div>
+                                    <div class="field"><label for="member3">Member 3 Full Name</label><input id="member3" name="member3" type="text" placeholder="Full Name"></div>
+                                    <div class="field"><label for="member3Phone">Member 3 Phone</label><input id="member3Phone" name="member3_phone" type="tel" placeholder="Phone"></div>
+                                    <div class="field"><label for="member4">Member 4 Full Name</label><input id="member4" name="member4" type="text" placeholder="Full Name"></div>
+                                    <div class="field"><label for="member4Phone">Member 4 Phone</label><input id="member4Phone" name="member4_phone" type="tel" placeholder="Phone"></div>
+                                    <div class="field"><label for="member5">Member 5 Full Name</label><input id="member5" name="member5" type="text" placeholder="Full Name"></div>
+                                    <div class="field"><label for="member5Phone">Member 5 Phone</label><input id="member5Phone" name="member5_phone" type="tel" placeholder="Phone"></div>
+                                </div>
+                            </div>
+
+                            <div class="field full">
+                                <div class="money-box">
+                                    <div class="label">Selected Ticket</div>
+                                    <div class="amount" id="ticketAmount">KSh 99</div>
+                                </div>
+                            </div>
+
+                            <div class="field full">
+                                <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:16px;border:1px solid var(--line);">
+                                    <p style="color:var(--gold-soft);font-weight:700;margin-bottom:6px;">💳 M-Pesa Till: <span style="font-size:1.4rem;">216445</span></p>
+                                    <p style="color:var(--text-soft);font-size:0.85rem;">After booking, pay the amount to the till number above. You will receive your ticket via email and on this page.</p>
+                                </div>
+                            </div>
+
+                            <div class="field full">
+                                <div class="cta-row">
+                                    <button type="submit" class="btn btn-primary" id="registerSubmit">Book Ticket</button>
+                                    <button type="reset" class="btn btn-secondary">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <aside class="payment-summary">
+                    <h3>Booking Summary</h3>
+                    <div class="summary-line"><span>Event</span><strong>Breaking the Ice</strong></div>
+                    <div class="summary-line"><span>Date</span><strong>22 Aug 2026</strong></div>
+                    <div class="summary-line"><span>Time</span><strong>9:00 AM – 2:00 PM</strong></div>
+                    <div class="summary-line"><span>Venue</span><strong>Kamulu</strong></div>
+                    <div class="summary-line"><span>Dress Code</span><strong>School Uniform</strong></div>
+                    <div class="order-total">
+                        <div class="summary-line"><span>Ticket Type</span><strong id="summaryTicket">Single</strong></div>
+                        <div class="summary-line"><span>Amount Due</span><strong id="summaryTotal">KSh 99</strong></div>
+                        <div class="summary-line"><span>Payment</span><strong>M-Pesa Till 216445</strong></div>
+                    </div>
+                    <div class="cta-row">
+                        <a class="btn btn-plain" href="#tickets">Choose Ticket</a>
+                    </div>
+                </aside>
+            </div>
+
+            <div class="ticket-display" id="ticketDisplay">
+                <div class="ticket-paper" id="ticketPaper">
+                    <div class="ticket-header">
+                        <span class="org">✝ UNITED IN CHRIST</span>
+                        <span class="badge">✓ BOOKED</span>
+                    </div>
+                    <div class="event-name">Breaking the Ice</div>
+                    <div class="event-sub">School Uniform Edition · 22 August 2026</div>
+
+                    <div class="ticket-body">
+                        <div class="ticket-details" id="ticketDetails">
+                            <div class="row"><span class="lbl">Attendee</span><span class="val" id="ticketName">—</span></div>
+                            <div class="row"><span class="lbl">Email</span><span class="val" id="ticketEmail">—</span></div>
+                            <div class="row"><span class="lbl">Phone</span><span class="val" id="ticketPhone">—</span></div>
+                            <div class="row"><span class="lbl">Ticket</span><span class="val" id="ticketTypeLabel">Single</span></div>
+                            <div class="row"><span class="lbl">Amount</span><span class="val" id="ticketAmountLabel">KSh 99</span></div>
+                            <div class="row"><span class="lbl">Venue</span><span class="val">Abundant Life Worship Church, Kamulu</span></div>
+                            <div class="row"><span class="lbl">Time</span><span class="val">9:00 AM – 2:00 PM</span></div>
+                            <div class="row"><span class="lbl">Till Number</span><span class="val">216445</span></div>
+                        </div>
+                        <div class="qr-wrap">
+                            <div id="qrcode"></div>
+                            <div class="ticket-id" id="ticketId">TKT-0000-0000</div>
+                        </div>
+                    </div>
+
+                    <div class="ticket-footer">
+                        <span>"Come as strangers. Leave as a community."</span>
+                        <span class="verse">— United in Christ</span>
+                    </div>
+                </div>
+
+                <div class="ticket-actions">
+                    <button class="btn btn-success" onclick="window.print()">🖨 Print Ticket</button>
+                    <button class="btn btn-secondary" onclick="downloadTicket()">⬇ Download Ticket</button>
+                    <button class="btn btn-secondary" onclick="hideTicket()">✕ Close</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== MY TICKETS SECTION ===== -->
+    <section id="myTicketsSection" class="section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <div class="kicker">My Tickets</div>
+                    <h2 class="section-title">Your <span>bookings</span></h2>
+                </div>
+                <div class="section-subtitle">View and download all your booked tickets</div>
+            </div>
+            <div id="myTickets" class="show">
+                <div id="myTicketsList">
+                    <p style="color: var(--text-soft); text-align: center; padding: 40px 0;">No tickets found. Book your ticket now!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== ADMIN DASHBOARD ===== -->
+    <section id="admin" class="section">
+        <div class="container">
+            <div class="section-header">
+                <div>
+                    <div class="kicker">Admin Panel</div>
+                    <h2 class="section-title">Booking <span>Dashboard</span></h2>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="closeAdmin()">✕ Close</button>
+                </div>
+            </div>
+
+            <div class="admin-stats" id="adminStats">
+                <div class="admin-stat-card"><div class="number" id="totalCount">0</div><span class="label">Total Bookings</span></div>
+                <div class="admin-stat-card"><div class="number" id="singleCount">0</div><span class="label">Single</span></div>
+                <div class="admin-stat-card"><div class="number" id="group3Count">0</div><span class="label">Group of 3</span></div>
+                <div class="admin-stat-card"><div class="number" id="group5Count">0</div><span class="label">Group of 5</span></div>
+            </div>
+
+            <div class="admin-toolbar">
+                <button class="btn btn-primary" onclick="loadRegistrations()">🔄 Refresh</button>
+                <button class="btn btn-success" onclick="exportToCSV()">📥 Export CSV</button>
+                <button class="btn btn-danger" onclick="exportToPDF()">📄 Export PDF</button>
+                <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: auto;" id="dataSourceLabel">Source: localStorage 💾</span>
+            </div>
+
+            <div id="registrationsList" style="display: grid; gap: 10px;">
+                <p style="color: var(--text-soft); text-align: center; padding: 40px 0;">Enter the password to view bookings.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section">
+        <div class="container contact-layout">
+            <div class="contact-panel">
+                <div class="kicker">Contact</div>
+                <h2 class="section-title">Get in touch</h2>
+                <p>Questions about the event, booking or ticketing? Reach out to our team.</p>
+                <ul class="contact-list">
+                    <li><span>☎</span> <div><strong>Simon</strong><br>0708 726 619</div></li>
+                    <li><span>☎</span> <div><strong>Lee</strong><br>0759 628 773</div></li>
+                    <li><span>⌖</span> <div><strong>Venue</strong><br>Abundant Life Worship Church<br>Kamulu</div></li>
+                    <li><span>◌</span> <div><strong>Date & Time</strong><br>22 August 2026<br>9:00 AM - 2:00 PM</div></li>
+                </ul>
+                <div class="contact-actions">
+                    <a class="btn btn-primary" href="tel:+254708726619">Call Simon</a>
+                    <a class="btn btn-secondary" href="https://wa.me/254708726619" target="_blank">WhatsApp</a>
+                </div>
+            </div>
+            <div class="map-panel">
+                <div class="venue-box">
+                    <div class="kicker">Gathering Place</div>
+                    <h3>Abundant Life Worship Church</h3>
+                    <p>Kamulu</p>
+                    <p>22 August 2026 · 9:00 AM – 2:00 PM</p>
+                    <p>Dress code: School Uniform</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="brand">
+                        <div class="brand-icon">UIC</div>
+                        <div class="brand-text">
+                            <span class="company">UNITED IN CHRIST</span>
+                            <span class="event">Breaking the Ice</span>
+                        </div>
+                    </div>
+                    <p class="copyright">© 2026 United in Christ. All rights reserved.</p>
+                </div>
+                <div>
+                    <div class="footer-title">Explore</div>
+                    <div class="footer-links">
+                        <a href="#about">About</a>
+                        <a href="#activities">Activities</a>
+                        <a href="#tickets">Tickets</a>
+                        <a href="#register">Register</a>
+                    </div>
+                </div>
+                <div>
+                    <div class="footer-title">Contact</div>
+                    <div class="footer-links">
+                        <a href="tel:+254708726619">Simon: 0708 726 619</a>
+                        <a href="tel:+254759628773">Lee: 0759 628 773</a>
+                        <a href="#contact">Kamulu</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Hidden container for PDF generation -->
+    <div id="pdfContainer" style="display: none;">
+        <div class="pdf-export-container" id="pdfContent">
+            <div class="pdf-header">
+                <h1>UNITED IN CHRIST — Breaking the Ice</h1>
+                <p>Booking Report • Generated on <span id="pdfDate"></span></p>
+            </div>
+            <div class="pdf-stats" id="pdfStats">
+                <div class="pdf-stat"><div class="num" id="pdfTotal">0</div><div class="lbl">Total Bookings</div></div>
+                <div class="pdf-stat"><div class="num" id="pdfSingle">0</div><div class="lbl">Single</div></div>
+                <div class="pdf-stat"><div class="num" id="pdfGroup3">0</div><div class="lbl">Group of 3</div></div>
+                <div class="pdf-stat"><div class="num" id="pdfGroup5">0</div><div class="lbl">Group of 5</div></div>
+            </div>
+            <table id="pdfTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Church</th>
+                        <th>County</th>
+                        <th>Ticket</th>
+                        <th>Booked At</th>
+                    </tr>
+                </thead>
+                <tbody id="pdfTableBody">
+                </tbody>
+            </table>
+            <div class="pdf-footer">
+                <p>© 2026 United in Christ • Abundant Life Worship Church, Kamulu • 22 August 2026</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ---------- PASSWORD PROTECTION ----------
+        const ADMIN_PASSWORD = "12345678";
+        let isAdminAuthenticated = false;
+
+        function requestAdminAccess() {
+            const overlay = document.getElementById('passwordOverlay');
+            overlay.classList.add('active');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('passwordError').textContent = '';
+            setTimeout(() => {
+                document.getElementById('adminPassword').focus();
+            }, 100);
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordOverlay').classList.remove('active');
+        }
+
+        function handlePasswordSubmit() {
+            const input = document.getElementById('adminPassword');
+            const error = document.getElementById('passwordError');
+            if (input.value === ADMIN_PASSWORD) {
+                isAdminAuthenticated = true;
+                closePasswordModal();
+                openAdminDashboard();
+            } else {
+                error.textContent = '❌ Incorrect password. Try again.';
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        document.getElementById('passwordSubmitBtn').addEventListener('click', handlePasswordSubmit);
+        document.getElementById('adminPassword').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') handlePasswordSubmit();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePasswordModal();
+            }
+        });
+
+        function openAdminDashboard() {
+            const admin = document.getElementById('admin');
+            admin.classList.add('show');
+            loadRegistrations();
+            admin.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function closeAdmin() {
+            document.getElementById('admin').classList.remove('show');
+        }
+
+        // ---------- APP STATE ----------
+        const ticketPrices = {
+            'single': 99,
+            'group3': 199,
+            'group5': 349
+        };
+        const ticketTypeMap = {
+            'single': 'Single',
+            'group3': 'Group of 3',
+            'group5': 'Group of 5'
+        };
+
+        const ticketType = document.getElementById('ticketType');
+        const amountField = document.getElementById('ticketAmount');
+        const summaryTicket = document.getElementById('summaryTicket');
+        const summaryTotal = document.getElementById('summaryTotal');
+        const groupMembers = document.getElementById('groupMembers');
+
+        function formatKsh(value) {
+            return 'KSh ' + value;
+        }
+
+        ticketType.addEventListener('change', function() {
+            const selected = ticketType.value;
+            const price = ticketPrices[selected];
+            amountField.textContent = formatKsh(price);
+            summaryTicket.textContent = ticketTypeMap[selected];
+            summaryTotal.textContent = formatKsh(price);
+
+            if (selected === 'group3' || selected === 'group5') {
+                groupMembers.classList.add('active');
+            } else {
+                groupMembers.classList.remove('active');
+            }
+        });
+
+        const navToggle = document.getElementById('navToggle');
+        const mainNav = document.getElementById('mainNav');
+        navToggle.addEventListener('click', function() {
+            mainNav.classList.toggle('open');
+        });
+
+        // Countdown
+        const eventDate = new Date('2026-08-22T09:00:00+03:00');
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = eventDate - now;
+            if (diff <= 0) {
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                return;
+            }
+            const totalSec = Math.floor(diff / 1000);
+            document.getElementById('days').textContent = String(Math.floor(totalSec / 86400)).padStart(2, '0');
+            document.getElementById('hours').textContent = String(Math.floor((totalSec % 86400) / 3600)).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(totalSec % 60).padStart(2, '0');
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // ---------- TICKET / QR / DISPLAY ----------
+        const registrationForm = document.getElementById('registrationForm');
+        const registerSubmit = document.getElementById('registerSubmit');
+        const ticketDisplay = document.getElementById('ticketDisplay');
+        const qrContainer = document.getElementById('qrcode');
+
+        function generateTicketId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let id = 'TKT-';
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    id += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                if (i < 3) id += '-';
+            }
+            return id;
+        }
+
+        function generateToken(data) {
+            let hash = 0;
+            for (let i = 0; i < data.length; i++) {
+                hash = ((hash << 5) - hash) + data.charCodeAt(i);
+                hash = hash & hash;
+            }
+            return 'UIC-' + Math.abs(hash).toString(16).toUpperCase().padStart(8, '0');
+        }
+
+        function showTicket(formData) {
+            const name = formData.full_name || 'Attendee';
+            const email = formData.email || '—';
+            const phone = formData.phone || '—';
+            const ticketTypeVal = formData.ticket_type || 'single';
+            const ticketLabel = ticketTypeMap[ticketTypeVal] || 'Single';
+            const amount = ticketPrices[ticketTypeVal] || 99;
+
+            document.getElementById('ticketName').textContent = name;
+            document.getElementById('ticketEmail').textContent = email;
+            document.getElementById('ticketPhone').textContent = phone;
+            document.getElementById('ticketTypeLabel').textContent = ticketLabel;
+            document.getElementById('ticketAmountLabel').textContent = formatKsh(amount);
+
+            const ticketId = generateTicketId();
+            document.getElementById('ticketId').textContent = ticketId;
+
+            const qrData = JSON.stringify({
+                id: ticketId,
+                name: name,
+                email: email,
+                phone: phone,
+                ticket: ticketLabel,
+                event: 'Breaking the Ice',
+                date: '22 Aug 2026',
+                venue: 'Abundant Life Worship Church, Kamulu',
+                till: '216445',
+                token: generateToken(name + email + ticketId)
+            });
+
+            qrContainer.innerHTML = '';
+
+            try {
+                new QRCode(qrContainer, {
+                    text: qrData,
+                    width: 110,
+                    height: 110,
+                    colorDark: '#1a1a2e',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                qrContainer.innerHTML = '<div style="font-size:10px;color:#1a1a2e;background:#fff;padding:12px;border-radius:8px;word-break:break-all;max-width:110px;">' +
+                    qrData.substring(0, 80) + '…</div>';
+                console.warn('QR fallback used.', e);
+            }
+
+            ticketDisplay.classList.add('visible');
+            ticketDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function hideTicket() {
+            ticketDisplay.classList.remove('visible');
+        }
+
+        function downloadTicket() {
+            window.print();
+        }
+
+        window.hideTicket = hideTicket;
+        window.downloadTicket = downloadTicket;
+
+        // ---------- SAVE TO LOCALSTORAGE ----------
+        function saveRegistration(payload) {
+            try {
+                const key = 'uic_registrations';
+                const existing = JSON.parse(localStorage.getItem(key) || '[]');
+                const cleanData = {};
+                for (const [key, value] of Object.entries(payload)) {
+                    if (value !== undefined && value !== null && value !== '') {
+                        cleanData[key] = value;
+                    }
+                }
+                cleanData.registeredAt = new Date().toISOString();
+                cleanData.event = 'Breaking the Ice 2026';
+                cleanData.tillNumber = '216445';
+                cleanData.localId = Date.now();
+                existing.push(cleanData);
+                localStorage.setItem(key, JSON.stringify(existing));
+                console.log('💾 Booking saved to localStorage');
+                return { success: true, id: 'local-' + Date.now(), source: 'localStorage' };
+            } catch (e) {
+                console.error('❌ LocalStorage save error:', e);
+                return { success: false, error: e.message };
+            }
+        }
+
+        // ---------- ADMIN DASHBOARD ----------
+        let allRegistrations = [];
+
+        function loadRegistrations() {
+            if (!isAdminAuthenticated) {
+                requestAdminAccess();
+                return;
+            }
+
+            const list = document.getElementById('registrationsList');
+            list.innerHTML = '<p style="color: var(--text-soft); text-align: center; padding: 20px;">Loading bookings...</p>';
+
+            try {
+                const localData = JSON.parse(localStorage.getItem('uic_registrations') || '[]');
+                allRegistrations = localData.map(item => ({ id: item.localId || 'local', ...item }));
+                renderRegistrations(allRegistrations);
+                updateStats(allRegistrations);
+                document.getElementById('dataSourceLabel').textContent = 'Source: localStorage 💾';
+            } catch (e) {
+                list.innerHTML = '<p style="color: var(--danger);">❌ Error loading bookings.</p>';
+                console.error(e);
+            }
+        }
+        window.loadRegistrations = loadRegistrations;
+
+        function renderRegistrations(registrations) {
+            const list = document.getElementById('registrationsList');
+
+            if (!registrations || registrations.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-soft); text-align: center; padding: 40px 0;">No bookings found.</p>';
+                return;
+            }
+
+            let html = '';
+            registrations.forEach(reg => {
+                const name = reg.full_name || 'Unknown';
+                const email = reg.email || '—';
+                const phone = reg.phone || '—';
+                const ticket = ticketTypeMap[reg.ticket_type] || reg.ticket_type || '—';
+                const church = reg.church || '—';
+                const county = reg.county || '—';
+                const time = reg.registeredAt ? new Date(reg.registeredAt).toLocaleString() : '—';
+
+                html += `
+                    <div class="registration-item">
+                        <div>
+                            <div class="name">${name}</div>
+                            <div class="meta">
+                                <span>📧 ${email}</span>
+                                <span>📱 ${phone}</span>
+                                <span>⛪ ${church}</span>
+                                <span>📍 ${county}</span>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div><span class="badge-ticket">${ticket}</span></div>
+                            <div class="time">${time}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+        }
+
+        function updateStats(registrations) {
+            document.getElementById('totalCount').textContent = registrations.length;
+            let singles = 0,
+                g3 = 0,
+                g5 = 0;
+            registrations.forEach(r => {
+                const t = r.ticket_type || 'single';
+                if (t === 'single') singles++;
+                else if (t === 'group3') g3++;
+                else if (t === 'group5') g5++;
+            });
+            document.getElementById('singleCount').textContent = singles;
+            document.getElementById('group3Count').textContent = g3;
+            document.getElementById('group5Count').textContent = g5;
+        }
+
+        // ---------- EXPORT CSV ----------
+        function exportToCSV() {
+            if (!allRegistrations || allRegistrations.length === 0) {
+                alert('No bookings to export.');
+                return;
+            }
+
+            const headers = ['full_name', 'email', 'phone', 'whatsapp', 'gender', 'age_group', 'church', 'church_location',
+                'county', 'ticket_type', 'prayer_request', 'instagram', 'tiktok', 'registeredAt'
+            ];
+            let csv = headers.join(',') + '\n';
+
+            allRegistrations.forEach(row => {
+                const values = headers.map(h => {
+                    const val = row[h] || '';
+                    return `"${String(val).replace(/"/g, '""')}"`;
+                });
+                csv += values.join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `bookings_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+        window.exportToCSV = exportToCSV;
+
+        // ---------- EXPORT PDF ----------
+        function exportToPDF() {
+            if (!allRegistrations || allRegistrations.length === 0) {
+                alert('No bookings to export.');
+                return;
+            }
+
+            document.getElementById('pdfDate').textContent = new Date().toLocaleString();
+
+            let singles = 0,
+                g3 = 0,
+                g5 = 0;
+            allRegistrations.forEach(r => {
+                const t = r.ticket_type || 'single';
+                if (t === 'single') singles++;
+                else if (t === 'group3') g3++;
+                else if (t === 'group5') g5++;
+            });
+            document.getElementById('pdfTotal').textContent = allRegistrations.length;
+            document.getElementById('pdfSingle').textContent = singles;
+            document.getElementById('pdfGroup3').textContent = g3;
+            document.getElementById('pdfGroup5').textContent = g5;
+
+            const tbody = document.getElementById('pdfTableBody');
+            let rows = '';
+            allRegistrations.forEach((reg, index) => {
+                const ticket = ticketTypeMap[reg.ticket_type] || reg.ticket_type || '—';
+                const time = reg.registeredAt ? new Date(reg.registeredAt).toLocaleString() : '—';
+                rows += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${reg.full_name || 'Unknown'}</td>
+                        <td>${reg.email || '—'}</td>
+                        <td>${reg.phone || '—'}</td>
+                        <td>${reg.church || '—'}</td>
+                        <td>${reg.county || '—'}</td>
+                        <td>${ticket}</td>
+                        <td>${time}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = rows;
+
+            const element = document.getElementById('pdfContent');
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `bookings_${new Date().toISOString().slice(0,10)}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            const btn = document.querySelector('.admin-toolbar .btn-danger');
+            const originalText = btn.textContent;
+            btn.textContent = '⏳ Generating PDF...';
+            btn.disabled = true;
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }).catch((err) => {
+                console.error('PDF generation error:', err);
+                alert('Error generating PDF. Please try again.');
+                btn.textContent = originalText;
+                btn.disabled = false;
+            });
+        }
+        window.exportToPDF = exportToPDF;
+
+        // ---------- MY TICKETS ----------
+        function loadMyTickets() {
+            const list = document.getElementById('myTicketsList');
+            let tickets = [];
+
+            try {
+                const localData = JSON.parse(localStorage.getItem('uic_registrations') || '[]');
+                tickets = localData;
+            } catch (e) {
+                console.warn('Error loading local tickets:', e);
+            }
+
+            if (tickets.length === 0) {
+                list.innerHTML = '<p style="color: var(--text-soft); text-align: center; padding: 40px 0;">No tickets found. Book your ticket now!</p>';
+                return;
+            }
+
+            let html = '';
+            tickets.forEach((ticket, index) => {
+                const name = ticket.full_name || 'Unknown';
+                const email = ticket.email || '—';
+                const phone = ticket.phone || '—';
+                const ticketType = ticketTypeMap[ticket.ticket_type] || ticket.ticket_type || 'Single';
+                const amount = ticketPrices[ticket.ticket_type] || 99;
+                const ticketId = 'TKT-' + String(index + 1).padStart(4, '0') + '-' + String(Date.now()).slice(-4);
+                const time = ticket.registeredAt ? new Date(ticket.registeredAt).toLocaleString() : '—';
+
+                html += `
+                    <div class="my-ticket-item">
+                        <div class="ticket-info">
+                            <div class="name">${name}</div>
+                            <div class="detail">📧 ${email} | 📱 ${phone}</div>
+                            <div class="detail">🎫 ${ticketType} | 💰 ${formatKsh(amount)}</div>
+                            <div class="detail">📅 Booked: ${time}</div>
+                            <div class="detail" style="color:var(--gold-soft);">💳 Pay via M-Pesa Till: 216445</div>
+                        </div>
+                        <div class="ticket-actions-mini">
+                            <button class="btn btn-success" onclick="viewTicket(${index})">👁 View</button>
+                            <button class="btn btn-secondary" onclick="downloadTicketPDF(${index})">⬇ Download</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+            window._myTickets = tickets;
+        }
+
+        function viewTicket(index) {
+            const ticket = window._myTickets[index];
+            if (!ticket) return;
+
+            const name = ticket.full_name || 'Attendee';
+            const email = ticket.email || '—';
+            const phone = ticket.phone || '—';
+            const ticketTypeVal = ticket.ticket_type || 'single';
+            const ticketLabel = ticketTypeMap[ticketTypeVal] || 'Single';
+            const amount = ticketPrices[ticketTypeVal] || 99;
+
+            document.getElementById('ticketName').textContent = name;
+            document.getElementById('ticketEmail').textContent = email;
+            document.getElementById('ticketPhone').textContent = phone;
+            document.getElementById('ticketTypeLabel').textContent = ticketLabel;
+            document.getElementById('ticketAmountLabel').textContent = formatKsh(amount);
+
+            const ticketId = 'TKT-' + String(index + 1).padStart(4, '0') + '-' + String(Date.now()).slice(-4);
+            document.getElementById('ticketId').textContent = ticketId;
+
+            const qrData = JSON.stringify({
+                id: ticketId,
+                name: name,
+                email: email,
+                phone: phone,
+                ticket: ticketLabel,
+                event: 'Breaking the Ice',
+                date: '22 Aug 2026',
+                venue: 'Abundant Life Worship Church, Kamulu',
+                till: '216445',
+                token: generateToken(name + email + ticketId)
+            });
+
+            qrContainer.innerHTML = '';
+
+            try {
+                new QRCode(qrContainer, {
+                    text: qrData,
+                    width: 110,
+                    height: 110,
+                    colorDark: '#1a1a2e',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                qrContainer.innerHTML = '<div style="font-size:10px;color:#1a1a2e;background:#fff;padding:12px;border-radius:8px;word-break:break-all;max-width:110px;">' +
+                    qrData.substring(0, 80) + '…</div>';
+                console.warn('QR fallback used.', e);
+            }
+
+            ticketDisplay.classList.add('visible');
+            ticketDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function downloadTicketPDF(index) {
+            const ticket = window._myTickets[index];
+            if (!ticket) return;
+
+            const name = ticket.full_name || 'Attendee';
+            const email = ticket.email || '—';
+            const phone = ticket.phone || '—';
+            const ticketTypeVal = ticket.ticket_type || 'single';
+            const ticketLabel = ticketTypeMap[ticketTypeVal] || 'Single';
+            const amount = ticketPrices[ticketTypeVal] || 99;
+            const ticketId = 'TKT-' + String(index + 1).padStart(4, '0') + '-' + String(Date.now()).slice(-4);
+
+            document.getElementById('ticketName').textContent = name;
+            document.getElementById('ticketEmail').textContent = email;
+            document.getElementById('ticketPhone').textContent = phone;
+            document.getElementById('ticketTypeLabel').textContent = ticketLabel;
+            document.getElementById('ticketAmountLabel').textContent = formatKsh(amount);
+            document.getElementById('ticketId').textContent = ticketId;
+
+            ticketDisplay.classList.add('visible');
+            ticketDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            setTimeout(() => {
+                window.print();
+            }, 500);
+        }
+
+        // ---------- FORM SUBMIT ----------
+        registrationForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            if (!registrationForm.checkValidity()) {
+                registrationForm.reportValidity();
+                return;
+            }
+
+            registerSubmit.textContent = 'Booking...';
+            registerSubmit.disabled = true;
+
+            const formData = new FormData(registrationForm);
+            const payload = Object.fromEntries(formData.entries());
+
+            try {
+                const confirmBooking = confirm(
+                    '📋 Confirm Booking\n\n' +
+                    'Ticket: ' + ticketTypeMap[payload.ticket_type || 'single'] + '\n' +
+                    'Amount: ' + formatKsh(ticketPrices[payload.ticket_type || 'single']) + '\n' +
+                    'Pay via M-Pesa Till: 216445\n\n' +
+                    'Click OK to complete your booking.'
+                );
+
+                if (!confirmBooking) {
+                    registerSubmit.textContent = 'Book Ticket';
+                    registerSubmit.disabled = false;
+                    return;
+                }
+
+                // Simulate processing
+                registerSubmit.textContent = '⏳ Processing...';
+                
+                // Use setTimeout to simulate async operation
+                setTimeout(() => {
+                    const saveResult = saveRegistration(payload);
+                    
+                    if (!saveResult.success) {
+                        alert('⚠️ Booking could not be saved. Please try again.');
+                        registerSubmit.textContent = 'Book Ticket';
+                        registerSubmit.disabled = false;
+                        return;
+                    }
+
+                    showTicket(payload);
+                    alert('✅ Booking successful! Your ticket is ready below.\n📁 Booking saved to ' + saveResult.source +
+                        '\n💳 Pay via M-Pesa Till: 216445');
+                    
+                    if (document.getElementById('admin').classList.contains('show')) {
+                        loadRegistrations();
+                    }
+
+                    loadMyTickets();
+                    registrationForm.reset();
+                    ticketType.dispatchEvent(new Event('change'));
+
+                    registerSubmit.textContent = 'Book Ticket';
+                    registerSubmit.disabled = false;
+                }, 1000);
+
+            } catch (error) {
+                alert('⚠️ An error occurred. Please try again.');
+                console.error(error);
+                registerSubmit.textContent = 'Book Ticket';
+                registerSubmit.disabled = false;
+            }
+        });
+
+        ticketType.dispatchEvent(new Event('change'));
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (document.getElementById('admin').classList.contains('show')) {
+                document.getElementById('admin').classList.remove('show');
+            }
+            loadMyTickets();
+        });
+
+        window.loadMyTickets = loadMyTickets;
+        window.viewTicket = viewTicket;
+        window.downloadTicketPDF = downloadTicketPDF;
+        window.requestAdminAccess = requestAdminAccess;
+        window.closePasswordModal = closePasswordModal;
+        window.closeAdmin = closeAdmin;
+    </script>
+
+</body>
+</html>
